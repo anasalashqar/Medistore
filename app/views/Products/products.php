@@ -372,54 +372,49 @@ $baseUrl = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']);
                 cartButton.querySelector("span").innerText = `${count}`;
             }
         }
+        document.querySelectorAll(".favorite-form").forEach((form) => {
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault(); // Prevent full page reload
 
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll(".favorite-form").forEach((form) => {
-                form.addEventListener("submit", function(event) {
-                    event.preventDefault(); // ✅ Stop full-page reload
+                const formData = new FormData(form); // Use `form`, not `this`
+                const url = form.getAttribute("action");
+                const button = form.querySelector(".favorite-btn"); // Corrected selector
 
-                    const formData = new FormData(this);
-                    const url = this.getAttribute("action"); // ✅ AJAX URL
-                    const button = this.querySelector("button");
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        body: formData
+                    });
 
-                    fetch(url, {
-                            method: "POST",
-                            body: formData,
-                        })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.status === "success") {
-                                // ✅ Toggle button appearance
-                                if (url.includes("add")) {
-                                    button.classList.remove("btn-outline-danger");
-                                    button.classList.add("btn-danger");
-                                    button.innerHTML = '<i class="fa fa-heart"></i>';
-                                    this.setAttribute("action", "/public/removefromfavorites"); // ✅ Update action
-                                } else {
-                                    button.classList.remove("btn-danger");
-                                    button.classList.add("btn-outline-danger");
-                                    button.innerHTML = '<i class="fa-regular fa-heart"></i>';
-                                    this.setAttribute("action", "/public/addtofavorites"); // ✅ Update action
-                                }
+                    const data = await response.json();
 
-                                // ✅ Update favorite count dynamically
-                                updateFavoriteCount(data.favorite_count);
-                            } else {
-                                alert(data.message);
-                            }
-                        })
-                        .catch((error) => console.error("Error:", error));
-                });
+                    if (data.status) {
+                        if (url.includes("add")) {
+                            button.classList.remove("btn-outline-danger");
+                            button.classList.add("btn-danger");
+                            form.setAttribute("action", "/public/removefromfavorites");
+                        } else {
+                            button.classList.remove("btn-danger");
+                            button.classList.add("btn-outline-danger");
+                            form.setAttribute("action", "/public/addtofavorites");
+                        }
+                        updateFavoriteCount(data.favorite_count);
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                }
             });
         });
 
-        // Function to update the favorite count in the header
-        function updateFavoriteCount(count) {
-            const favButton = document.getElementById("favoriteButton");
+        // Function to update the favorite count
+        const updateFavoriteCount = (count) => {
+            const favButton = document.getElementById("favoriteButton"); // Corrected ID
             if (favButton) {
                 favButton.querySelector("span").innerText = `${count}`;
             }
-        }
+        };
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {

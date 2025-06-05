@@ -12,6 +12,7 @@ class Auth
     }
 
 
+
     public function register($full_name, $email, $password, $phone_number, $address)
     {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);

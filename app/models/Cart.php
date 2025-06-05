@@ -1,5 +1,6 @@
 <?php
 
+
 class Cart
 {
     private $db;
@@ -8,6 +9,8 @@ class Cart
     {
         $this->db = $db;
     }
+
+    
 
     public function getCartItemCount($user_id)
     {
